@@ -1,13 +1,14 @@
-#include <stdio.h>
+#include <iostream>
 #include "energylib.h"
-#include <time.h>
-#include <stdlib.h>
+#include <cstdlib>
+#include <unistd.h>
 #define SIZE 10000
 
+using namespace std;
 
 int main(int argc, char **argv) {
   
-  printf("Start Monitoring\n");
+  cout<<"Start Monitoring\n";
   /* record data every 1 sec .*/
   
   int i,j;
@@ -30,7 +31,7 @@ int main(int argc, char **argv) {
   }
   
   /* stop monitoring*/
-  printf("Stop monitoring\n,%d",arr[1]);
+  cout<<"Stop monitoring"<<arr[1]<<endl;
   energymonitor__stopprofiling();
   return 0;
 }
