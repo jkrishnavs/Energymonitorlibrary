@@ -1,0 +1,6 @@
+This project is designed to create a C/C++ library for profiling the code for energy, Voltage etc 
+This project is generated from EnergyMonitor for odroidxu3.
+
+for more details see https://github.com/hardkernel/EnergyMonitor
+
+This also contains C and C++ examples and some sripts to extract the data from the generated. 
