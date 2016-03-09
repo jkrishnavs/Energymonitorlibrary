@@ -144,7 +144,7 @@ c   have more numbers to generate than others
     k_offset = -1;
 
 
-    int cores = 255;
+    int cores = __ALL_CORES;
     energymonitor__init(cores,1);
     energymonitor__startprofiling();
 #pragma omp parallel copyin(x)
