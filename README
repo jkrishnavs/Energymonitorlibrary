@@ -4,3 +4,5 @@ This project is generated from EnergyMonitor for odroidxu3.
 for more details see https://github.com/hardkernel/EnergyMonitor
 
 This also contains C and C++ examples and some sripts to extract the data from the generated. 
+
+We need sudo permission to run the programs. 
