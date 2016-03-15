@@ -105,6 +105,7 @@ extern "C" {
     __energymonitor__keepprofiling = STOP_PROFILE;
     time_t endtime;
     time(&endtime);
+    myfile.flush();
     myfile<<"Total Running time of the program is::"<<endtime-__energymonitor__start_time<<"secs"<<std::endl;
     myfile.close();
     __energymonitor__trackflag = 0;
