@@ -106,7 +106,8 @@ extern "C" {
     time_t endtime;
     time(&endtime);
     myfile.flush();
-    myfile<<"Total Running time of the program is::"<<endtime-__energymonitor__start_time<<"secs"<<std::endl;
+    myfile<<"\n Total Running time of the program is::"<<endtime-__energymonitor__start_time<<"secs"<<std::endl;
+    myfile.flush();
     myfile.close();
     __energymonitor__trackflag = 0;
     pthread_join(thread_id,NULL);
