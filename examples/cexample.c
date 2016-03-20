@@ -15,6 +15,8 @@ int main(int argc, char **argv) {
   srand(time(0));
   
   energymonitor__init(__ALL_CORES,1);
+  //energymonitor__trackpoweronly();
+  //  energymonitor__trackvoltage();
   energymonitor__startprofiling();
     /** dummy work **/
   for(i=0;i<SIZE;i++){

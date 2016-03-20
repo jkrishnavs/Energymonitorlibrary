@@ -28,7 +28,7 @@
 #ifdef __cplusplus
 extern "C"{
 #endif
-
+ 
   /**
      CTRL-C handler function.
      to close the system files.
@@ -64,6 +64,18 @@ extern "C"{
   void energymonitor__pauseprofiling();
   void energymonotor__upauseprofiling();
 
+  /**
+     set 1 to track only the power and voltage of the cores and memory
+     Will not record the temerature and Freuency of cores.
+   **/
+  void energymonitor__trackpoweronly();
+
+  /**
+     This function helps us to toglle from  tracking only nergy and voltage 
+     to start tracking everything.
+   **/
+  void energymonitor__trackvoltage();
+  void energymonitor__trackeverything();
   int energymonitor__runfunction();
   /**
      Change the tracked cores on the fly.

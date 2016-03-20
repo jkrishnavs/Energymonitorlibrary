@@ -1,5 +1,3 @@
-// coded by chan at 2014-09-04
-
 #include "energylib.h"
 #include "getnode.h"
 #include <fstream>
@@ -16,6 +14,8 @@ extern "C" {
 #define KEEP_PROFILE 1
 #define STOP_PROFILE 0
 
+#define TRACK_TEMPERATURE_AND_FREQ 1
+#define TRACK_VOLTAGE 1
 #define POS(i) (1<<i)
   float __energymonitor__sleeptime = 5.0;
   int __energymonitor__keepprofiling = STOP_PROFILE;
@@ -27,6 +27,9 @@ extern "C" {
   std::ofstream myfile;
   int __energymonitor__trackflag;
 
+  //  int __energymonitor__trackonlyPower = 0;
+  int __energymonitor__trackVoltage = 1;
+  int __energymonitor__trackTempandFreq = 1;
   /*                                                                                                                                                                                                       
       float __energymonitor__peakBigPowerConsumption;                                                                                                                                                        
       float __energymonitor__peakLittlePowerConsumption;                                                                                                                                                     
@@ -80,6 +83,22 @@ extern "C" {
     __energymonitor__sleeptime = microsecsleep;
   }
 
+  void energymonitor__trackpoweronly(){
+    __energymonitor__trackTempandFreq = 0;
+    __energymonitor__trackVoltage = 0;
+  }
+
+  void energymonitor__trackvoltage(){
+    __energymonitor__trackVoltage = 1;
+  }
+
+  void energymonitor__trackeverything(){
+    __energymonitor__trackTempandFreq = 1;
+    __energymonitor__trackVoltage = 1;
+
+  }
+
+
   void energymonitor__startprofiling(){
   __energymonitor__keepprofiling = KEEP_PROFILE;
   myfile.open (__energymonitor__filename);
@@ -106,6 +125,7 @@ extern "C" {
     time_t endtime;
     time(&endtime);
     myfile.flush();
+    myfile<<std::endl;
     myfile<<"\n Total Running time of the program is::"<<endtime-__energymonitor__start_time<<"secs"<<std::endl;
     myfile.flush();
     myfile.close();
@@ -121,6 +141,7 @@ extern "C" {
     time_t t;
     char NOW[20];
     float A7W, A15W, GPUW, MEMW;
+    float A7V, A15V, GPUV, MEMV;
     __energymonitor__getNode = new GetNode();
 	
 
@@ -129,8 +150,12 @@ extern "C" {
       std::cerr << "OpenINA231 error" << std::endl;
 	  exit(1);
     }else{
-      myfile<<"profile dump\n";
-      myfile<< "Time|CPU0_Freq(MHz)|CPU1_Freq|CPU2_Freq|CPU3_Freq|CPU4_Freq|CPU5_Freq|CPU6_Freq|CPU7_Freq|GPU_Freq|CPU0_Temp(C)|CPU1_Temp|CPU2_Temp|CPU3_Temp|GPU_Temp|A7_W|A15W|MEM_W|GPU_W|Watt_Sum" << std::endl;
+      myfile<<"profile dump\nTime|";
+      if(__energymonitor__trackTempandFreq)
+	myfile<< "CPU0_Freq(MHz)|CPU1_Freq|CPU2_Freq|CPU3_Freq|CPU4_Freq|CPU5_Freq|CPU6_Freq|CPU7_Freq|GPU_Freq|CPU0_Temp(C)|CPU1_Temp|CPU2_Temp|CPU3_Temp|GPU_Temp|";
+      if(__energymonitor__trackVoltage)
+	myfile<<"A7_V|A15_V|MEM_V|GPU_V|";
+      myfile<<"A7_W|A15W|MEM_W|GPU_W|Watt_Sum" << std::endl;
 
     }
     
@@ -141,27 +166,37 @@ extern "C" {
 	strftime(NOW, sizeof(NOW), "%F %T", localtime(&t));
 	myfile << NOW << "|";
 	
-	for (i = 0; i < NUMCORES; i++){
-	  if(__energymonitor__trackflag & POS(i))
-	    myfile << __energymonitor__getNode->GetCPUCurFreq(i) << "|";
-	  else
-	    myfile  << " 0 |";  
+	if(__energymonitor__trackTempandFreq){
+	  for (i = 0; i < NUMCORES; i++){
+	    if(__energymonitor__trackflag & POS(i))
+	      myfile << __energymonitor__getNode->GetCPUCurFreq(i) << "|";
+	    else
+	      myfile  << " 0 |";  
+	  }
+	  myfile<< __energymonitor__getNode->GetGPUCurFreq() << "|";
+	  
+	  for (i = 0; i < NUMCORES/2; i++){
+	    if(__energymonitor__trackflag & POS(i))
+	      myfile << __energymonitor__getNode->GetCPUTemp(i) << "|";
+	    else
+	      myfile  << " 0 |";  
+	  }
+	  myfile << __energymonitor__getNode->GetCPUTemp(NUMCORES/2) << "|";
 	}
-	myfile<< __energymonitor__getNode->GetGPUCurFreq() << "|";
-	
-	for (i = 0; i < NUMCORES/2; i++){
-	  if(__energymonitor__trackflag & POS(i))
-	    myfile << __energymonitor__getNode->GetCPUTemp(i) << "|";
-	  else
-	    myfile  << " 0 |";  
-	}
-	myfile << __energymonitor__getNode->GetCPUTemp(NUMCORES/2) << "|";
-	
 	A7W = __energymonitor__getNode->kfcuW;
 	A15W = __energymonitor__getNode->armuW;
 	GPUW =  __energymonitor__getNode->g3duW;
 	MEMW =  __energymonitor__getNode->memuW;
 	
+	if(__energymonitor__trackVoltage){
+	  A7V = __energymonitor__getNode->kfcuV;
+	  A15V = __energymonitor__getNode->armuV;
+	  MEMV = __energymonitor__getNode->memuV;
+	  GPUV = __energymonitor__getNode->g3duV;
+	  myfile << std::setprecision(3) << A7V << "|" << A15V << "|" << MEMV << "|"
+	         << GPUV << "|";
+	}
+
 	myfile << std::setprecision(3) << A7W << "|" << A15W << "|" << MEMW << "|" 
 	       << GPUW << "|" << std::setprecision(4) << A7W+A15W+MEMW+GPUW << std::endl;
       }	else{
