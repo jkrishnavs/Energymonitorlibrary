@@ -103,6 +103,7 @@ extern "C" {
   }
 
   void energymonitor__trackvoltage() {
+    __energymonitor__trackdetails &= TRACK_SAVEAS_CSV;
     __energymonitor__trackdetails |=  TRACK_VOLTAGE;
   }
 
@@ -196,6 +197,7 @@ extern "C" {
 	break;
       }
     }
+    myfile<<std::endl;
     
     while(__energymonitor__keepprofiling) {
       if(__energymonitor__keepprofiling  == KEEP_PROFILE) {
@@ -211,7 +213,7 @@ extern "C" {
 	myfile << std::setprecision(3) << A7W << "," << A15W << "," << MEMW << "," 
 	       << GPUW << "," << std::setprecision(4) << A7W+A15W+MEMW+GPUW << ",";
 
-	if(__energymonitor__trackflag && TRACK_VOLTAGE){
+	if(__energymonitor__trackflag & TRACK_VOLTAGE){
 	  A7V = __energymonitor__getNode->kfcuV;
 	  A15V = __energymonitor__getNode->armuV;
 	  MEMV = __energymonitor__getNode->memuV;
@@ -220,7 +222,7 @@ extern "C" {
 	         << GPUV << ",";
 	}
 
-	if(__energymonitor__trackdetails && TRACK_TEMPERATURE_AND_FREQ){
+	if(__energymonitor__trackdetails & TRACK_TEMPERATURE_AND_FREQ){
 	  myfile << __energymonitor__getNode->GetCPUCurFreq(0) << ",";
 	  myfile << __energymonitor__getNode->GetCPUCurFreq(__energymonitor__bigTracking) << ","; 
 	  myfile<< __energymonitor__getNode->GetGPUCurFreq() << ",";
