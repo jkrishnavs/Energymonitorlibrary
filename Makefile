@@ -21,12 +21,12 @@ TASKBENCH= $(SRC)/$(OMPSRC)/taskbench_1.0
 
 .PHONY: clean
 
-all: test 
-
+all: energymodule test 
 test: pthread omp linear
 pthread: fileio fileiocpu pc
 linear: simple
 omp: mergesort matrixmultiplication
+energymodule: updateenergymodule  testenergymodule
 
 updateenergymodule: sharedobject profiler
 
@@ -35,6 +35,7 @@ sharedobject: $(ENG)/energylib.cpp $(ENG)/getnode.cpp
 	$(C++11) -c $(C++FLAGS) $(PTHREADFLG) -I$(INC) $(ENG)/energylib.cpp $(ENG)/getnode.cpp 
 	$(C++11) -shared -o libenergymodule.so energylib.o getnode.o
 	sudo mv libenergymodule.so /usr/lib/
+	#sudo cp $(INC)/* /usr/inc/
 	rm -f *.o
 
 
@@ -57,5 +58,7 @@ mergesort: $(SRC)/$(OMPSRC)/mergesort.c
 matrixmultiplication: $(SRC)/$(OMPSRC)/omp_mm.c
 	$(CC) -o $(BIN)/mm_omp -I$(INC) $(SRC)/$(OMPSRC)/omp_mm.c $(OMPFLG) $(EMLKFLG)
 
+testenergymodule: testfeatures/test.c
+	$(CC) -o $(BIN)/testenergymodule -I$(INC) testfeatures/test.c $(OMPFLG) $(EMLKFLG)
 clean:
 	rm  -r ./$(BIN)/*

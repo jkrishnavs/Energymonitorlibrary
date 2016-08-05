@@ -20,6 +20,16 @@
 #define __CORES_CPU6 64
 #define __CORES_CPU7 128
 
+
+#define PAUSE_PROFILE 2
+#define KEEP_PROFILE 1
+#define STOP_PROFILE 0
+
+#define TRACK_TEMPERATURE_AND_FREQ 1
+#define TRACK_VOLTAGE 2
+#define TRACK_SAVEAS_CSV 4
+
+
 #define __ALL_CORES 255
 
 #define __LITTLE_CORES 15
@@ -38,6 +48,15 @@ extern "C"{
      default initialization.
    **/
   void energymonitor__initialize();
+  /**
+     customize profile file name
+   **/
+  void energymonitor__setfilename(char *profFileName);
+  /**
+     save the text as csv
+   **/
+  void energymonitor__saveascsv(char *profFileName);
+  void energymonitor__saveastextfile(char* profFileName);
   /**
      cores : The cpu mask to denote the cores we are tracking
      sleeptime (in seconds): moderates the frequency of profiling.
